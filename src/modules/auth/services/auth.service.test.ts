@@ -2,21 +2,8 @@ import { AuthService } from "../services/auth.service";
 import { AuthRepository } from "../repositories/auth.repository";
 import { jest } from "@jest/globals";
 import { HashMiddleware, JwtMiddleware } from "../middlewares";
-import { User } from "@prisma/client";
 import { FIVE_MINUTES_BLOCK, MAX_FAILED_ATTEMPTS, TOKEN_TTL } from "../constants";
-
-const mockUser: User = {
-  id: "user123",
-  firstName: "John",
-  lastName: "Doe",
-  email: "testEmail@test.com",
-  accountNumber: "123456",
-  pinHash: "hashedPin",
-  failedAttempts: 0,
-  blockedUntil: null,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-};
+import { mockUser } from "../mocks";
 
 describe("🛠 Auth Service", () => {
   let authService: AuthService;
