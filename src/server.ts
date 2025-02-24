@@ -1,17 +1,13 @@
 import express from "express";
-import logger from "./config/logger";
+import { authRoutes } from "./modules/auth/routes/auth.routes";
 
 const app = express();
-
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.status(200).send("API is running...");
-});
+app.use("/api/auth", authRoutes);
 
-if (process.env.NODE_ENV !== "test") {
-  const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => logger.info(`🚀 Server running on port ${PORT}`));
-}
+app.get("/health", (_req, res) => {
+  res.status(200).json({ status: "OK" });
+});
 
 export default app;
