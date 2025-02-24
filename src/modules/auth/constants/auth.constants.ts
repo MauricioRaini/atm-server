@@ -10,4 +10,6 @@ export const AUTH_MESSAGES = {
   USER_BLOCKED: "User is blocked",
   TOO_MANY_FAILED_ATTEMPTS: "Too many failed attempts",
   SAME_NEW_OLD_PIN: "New PIN cannot be the same as the old PIN",
+  SERVICE_UNAVAILABLE: "The service is currently unavailable, please try again later.",
+  INVALID_TOKEN: "Token is invalid or inexisting.",
 };
