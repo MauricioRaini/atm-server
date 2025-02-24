@@ -13,6 +13,7 @@ model User {
   firstName     String  @db.VarChar(255)
   lastName      String  @db.VarChar(255)
   email         String  @unique @db.VarChar(255)
+  failedAttempts Int     @default(0)
   pinHash       String  @db.VarChar(255)
   blockedUntil  DateTime?
   createdAt     DateTime @default(now())
