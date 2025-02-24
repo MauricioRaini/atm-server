@@ -10,7 +10,7 @@ export class AuthController {
    * @param req - Express request containing identifier and PIN.
    * @param res - Express response.
    */
-  async login(req: Request, res: Response) {
+  public async login(req: Request, res: Response) {
     try {
       const { identifier, pin } = req.body;
       const result = await this.authService.login(identifier, pin);
@@ -60,7 +60,7 @@ export class AuthController {
    * @param req - Express request containing userId, oldPin, and newPin.
    * @param res - Express response.
    */
-  async changePin(req: Request, res: Response) {
+  public async changePin(req: Request, res: Response) {
     try {
       const { userId, oldPin, newPin } = req.body;
       await this.authService.changePin(userId, oldPin, newPin);
