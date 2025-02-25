@@ -1,7 +1,6 @@
 import { AuthService } from "../services/auth.service";
 import { Request, Response } from "express";
 import { jest } from "@jest/globals";
-import { mockUser } from "../mocks";
 import { AUTH_MESSAGES } from "../constants";
 import { AuthController } from "./auth.controller";
 
@@ -37,7 +36,13 @@ describe("🛠 Auth Controller", () => {
 
     it("✅ Should return 200 and token on successful login", async () => {
       authService.login.mockResolvedValue({
-        user: mockUser,
+        user: {
+          id: "user123",
+          accountNumber: "123456",
+          firstName: "John",
+          lastName: "Doe",
+          blockedUntil: null,
+        },
         token: "valid.jwt.token",
         timeToLive: 300,
       });
@@ -47,7 +52,13 @@ describe("🛠 Auth Controller", () => {
       expect(authService.login).toHaveBeenCalledWith("123456", "0000");
       expect(res.status).toHaveBeenCalledWith(200);
       expect(jsonMock).toHaveBeenCalledWith({
-        user: { id: "user123", accountNumber: "123456" },
+        user: {
+          id: "user123",
+          accountNumber: "123456",
+          firstName: "John",
+          lastName: "Doe",
+          blockedUntil: null,
+        },
         token: "valid.jwt.token",
         timeToLive: 300,
       });
@@ -101,8 +112,8 @@ describe("🛠 Auth Controller", () => {
     });
   });
 
-  /* TODO: Implement when full logout service is ready in both FE and BE */
-  /*  describe("🔹 Given a user logs out", () => {
+  /* TODO: Implement when full logout service is ready in both FE and BE 
+  describe("🔹 Given a user logs out", () => {
     beforeEach(() => {
       req = { body: { token: "valid.jwt.token" } };
     });

@@ -3,7 +3,10 @@ import { AuthService } from "../services/auth.service";
 import { AUTH_MESSAGES } from "../constants";
 
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) {
+    this.login = this.login.bind(this);
+    this.changePin = this.changePin.bind(this);
+  }
 
   /**
    * Handles user login.
@@ -16,11 +19,12 @@ export class AuthController {
       const result = await this.authService.login(identifier, pin);
 
       return res.status(200).json({
-        user: { id: result.user.id, accountNumber: result.user.accountNumber },
+        user: result.user,
         token: result.token,
         timeToLive: result.timeToLive,
       });
     } catch (error: any) {
+      console.log(error);
       switch (error.message) {
         case AUTH_MESSAGES.UNAUTHORIZED:
           return res.status(401).json({ error: AUTH_MESSAGES.UNAUTHORIZED });

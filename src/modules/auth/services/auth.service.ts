@@ -7,8 +7,8 @@ import {
   MAX_FAILED_ATTEMPTS,
   NEW_FAILED_ATTEMPT,
   TOKEN_TTL,
+  USER_PUBLIC_FIELDS,
 } from "../constants";
-
 export class AuthService {
   constructor(
     private readonly authRepository: AuthRepository,
@@ -53,8 +53,16 @@ export class AuthService {
 
     const token = this.jwtProvider.generateToken({ userId: user.id });
 
+    const publicUser = {
+      [USER_PUBLIC_FIELDS.ID]: user[USER_PUBLIC_FIELDS.ID],
+      [USER_PUBLIC_FIELDS.ACCOUNT_NUMBER]: user[USER_PUBLIC_FIELDS.ACCOUNT_NUMBER],
+      [USER_PUBLIC_FIELDS.FIRST_NAME]: user[USER_PUBLIC_FIELDS.FIRST_NAME],
+      [USER_PUBLIC_FIELDS.LAST_NAME]: user[USER_PUBLIC_FIELDS.LAST_NAME],
+      [USER_PUBLIC_FIELDS.BLOCKED_UNTIL]: user[USER_PUBLIC_FIELDS.BLOCKED_UNTIL],
+    };
+
     return {
-      user,
+      user: publicUser,
       token,
       timeToLive: TOKEN_TTL,
     };

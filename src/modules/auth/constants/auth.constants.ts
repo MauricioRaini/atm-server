@@ -13,3 +13,11 @@ export const AUTH_MESSAGES = {
   SERVICE_UNAVAILABLE: "The service is currently unavailable, please try again later.",
   INVALID_TOKEN: "Token is invalid or inexisting.",
 };
+
+export const USER_PUBLIC_FIELDS = Object.freeze({
+  ID: "id",
+  ACCOUNT_NUMBER: "accountNumber",
+  FIRST_NAME: "firstName",
+  LAST_NAME: "lastName",
+  BLOCKED_UNTIL: "blockedUntil",
+});

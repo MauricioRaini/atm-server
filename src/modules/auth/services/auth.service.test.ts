@@ -2,8 +2,9 @@ import { AuthService } from "../services/auth.service";
 import { AuthRepository } from "../repositories/auth.repository";
 import { jest } from "@jest/globals";
 import { HashMiddleware, JwtMiddleware } from "../middlewares";
-import { FIVE_MINUTES_BLOCK, MAX_FAILED_ATTEMPTS, TOKEN_TTL } from "../constants";
+import { AUTH_MESSAGES, FIVE_MINUTES_BLOCK, MAX_FAILED_ATTEMPTS, TOKEN_TTL } from "../constants";
 import { mockUser } from "../mocks";
+import { User } from "@prisma/client";
 
 describe("🛠 Auth Service", () => {
   let authService: AuthService;
@@ -31,7 +32,11 @@ describe("🛠 Auth Service", () => {
 
   describe("🔹 Given a user logs in", () => {
     it("✅ Should return a token if login is successful", async () => {
-      authRepository.getUserByAccountNumber.mockResolvedValue(mockUser);
+      authRepository.getUserByAccountNumber.mockResolvedValue({
+        ...mockUser,
+        pinHash: "hashedPin",
+        failedAttempts: 0,
+      } as User);
       hashProvider.compare.mockResolvedValue(true);
       jwtProvider.generateToken.mockReturnValue("valid.jwt.token");
 
@@ -41,16 +46,26 @@ describe("🛠 Auth Service", () => {
       expect(hashProvider.compare).toHaveBeenCalledWith("000000", "hashedPin");
       expect(jwtProvider.generateToken).toHaveBeenCalledWith(expect.any(Object));
       expect(result).toEqual({
-        user: mockUser,
+        user: {
+          id: "user123",
+          accountNumber: "123456",
+          firstName: "John",
+          lastName: "Doe",
+          blockedUntil: null,
+        },
         token: "valid.jwt.token",
-        timeToLive: TOKEN_TTL,
+        timeToLive: 300,
       });
 
       expect(authRepository.setFailedAttempts).toHaveBeenCalledWith("user123", 0);
     });
 
     it("🚫 Should return 401 if PIN is incorrect", async () => {
-      authRepository.getUserByAccountNumber.mockResolvedValue(mockUser);
+      authRepository.getUserByAccountNumber.mockResolvedValue({
+        ...mockUser,
+        pinHash: "hashedPin",
+        failedAttempts: 0,
+      } as User);
       hashProvider.compare.mockResolvedValue(false);
 
       await expect(authService.login("123456", "wrongPin")).rejects.toThrow("Unauthorized");
@@ -61,8 +76,10 @@ describe("🛠 Auth Service", () => {
     it("🚫 Should return 403 if user is blocked", async () => {
       const blockedUser = {
         ...mockUser,
+        pinHash: "hashedPin",
+        failedAttempts: 0,
         blockedUntil: new Date(Date.now() + FIVE_MINUTES_BLOCK),
-      };
+      } as User;
       authRepository.getUserByAccountNumber.mockResolvedValue(blockedUser);
 
       await expect(authService.login("123456", "000000")).rejects.toThrow("User is blocked");
@@ -71,8 +88,9 @@ describe("🛠 Auth Service", () => {
     it("🚫 Should return 429 if too many failed attempts", async () => {
       const userWithFailedAttempts = {
         ...mockUser,
+        pinHash: "hashedPin",
         failedAttempts: MAX_FAILED_ATTEMPTS,
-      };
+      } as User;
       authRepository.getUserByAccountNumber.mockResolvedValue(userWithFailedAttempts);
 
       await expect(authService.login("123456", "wrongPin")).rejects.toThrow(
@@ -86,7 +104,7 @@ describe("🛠 Auth Service", () => {
       const blockedUser = {
         ...mockUser,
         blockedUntil: new Date(Date.now() - 1),
-      };
+      } as User;
       authRepository.getUserByAccountNumber.mockResolvedValue(blockedUser);
       hashProvider.compare.mockResolvedValue(true);
       jwtProvider.generateToken.mockReturnValue("valid.jwt.token");
@@ -104,7 +122,10 @@ describe("🛠 Auth Service", () => {
 
   describe("🔹 Given a user changes their PIN", () => {
     it("✅ Should update the user's PIN if the old PIN matches", async () => {
-      authRepository.getUserByAccountNumber.mockResolvedValue(mockUser);
+      authRepository.getUserByAccountNumber.mockResolvedValue({
+        ...mockUser,
+        pinHash: "hashedPin",
+      } as User);
       hashProvider.compare.mockResolvedValue(true);
       hashProvider.hash.mockResolvedValue("newHashedPin");
 
@@ -115,7 +136,10 @@ describe("🛠 Auth Service", () => {
     });
 
     it("🚫 Should return 401 if old PIN is incorrect", async () => {
-      authRepository.getUserByAccountNumber.mockResolvedValue(mockUser);
+      authRepository.getUserByAccountNumber.mockResolvedValue({
+        ...mockUser,
+        pinHash: "hashedPin",
+      } as User);
       hashProvider.compare.mockResolvedValue(false);
 
       await expect(authService.changePin("user123", "wrongPin", "123456")).rejects.toThrow(
@@ -125,7 +149,7 @@ describe("🛠 Auth Service", () => {
 
     it("🚫 Should return 400 if new PIN is the same as old PIN", async () => {
       await expect(authService.changePin("user123", "000000", "000000")).rejects.toThrow(
-        "New PIN cannot be the same as the old PIN",
+        AUTH_MESSAGES.SAME_NEW_OLD_PIN,
       );
     });
   });
