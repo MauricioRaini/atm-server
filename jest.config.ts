@@ -10,5 +10,5 @@ export default {
   coverageDirectory: "coverage",
   collectCoverageFrom: ["src/**/*.ts"],
   setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
-  moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, { prefix: "<rootDir>/" }),
+  moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, { prefix: "<rootDir>/src" }),
 };

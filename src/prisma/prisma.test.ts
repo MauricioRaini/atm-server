@@ -1,8 +1,11 @@
-import { prisma } from "../src/config/prisma";
+import { prisma } from "../config/prisma";
 import { beforeAll, afterAll } from "@jest/globals";
 
 beforeAll(async () => {
-  await prisma.user.deleteMany(); // Ensure clean start
+  await prisma.transaction.deleteMany();
+  await prisma.card.deleteMany();
+  await prisma.account.deleteMany();
+  await prisma.user.deleteMany();
 
   await prisma.user.create({
     data: {
@@ -21,5 +24,14 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+  await prisma.transaction.deleteMany();
+  await prisma.card.deleteMany();
+  await prisma.account.deleteMany();
   await prisma.user.deleteMany();
+});
+
+describe("Prisma Setup", () => {
+  it("should do something minimal", () => {
+    expect(true).toBe(true);
+  });
 });
