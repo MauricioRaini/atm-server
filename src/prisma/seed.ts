@@ -4,6 +4,10 @@ import { hashSync } from "bcryptjs";
 const prisma = new PrismaClient();
 
 async function main() {
+  await prisma.transaction.deleteMany();
+  await prisma.card.deleteMany();
+  await prisma.account.deleteMany();
+  await prisma.user.deleteMany();
   console.log("🌱 Seeding database...");
 
   const defaultPinHash = hashSync("0000", 10);
