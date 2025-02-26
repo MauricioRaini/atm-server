@@ -25,9 +25,10 @@ model User {
 model Account {
   id                String   @id @default(uuid())
   userId            String   @unique
-  balance           Decimal  @default(0.00) @db.Decimal(12,2)
-  dailyLimitDeposit Decimal  @default(5000.00) @db.Decimal(12,2)
-  dailyLimitWithdraw Decimal @default(5000.00) @db.Decimal(12,2)
+  overallBalance       Decimal  @default(0.00) @db.Decimal(12,2)
+  transferDailyLimit Decimal  @default(5000.00) @db.Decimal(12,2)
+  withdrawalDailyLimit Decimal @default(5000.00) @db.Decimal(12,2)
+  defaultCard          String
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 

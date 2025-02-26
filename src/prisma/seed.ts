@@ -4,11 +4,15 @@ import { hashSync } from "bcryptjs";
 const prisma = new PrismaClient();
 
 async function main() {
+  await prisma.transaction.deleteMany();
+  await prisma.card.deleteMany();
+  await prisma.account.deleteMany();
+  await prisma.user.deleteMany();
   console.log("🌱 Seeding database...");
 
   const defaultPinHash = hashSync("0000", 10);
 
-  const users = await prisma.user.createMany({
+  await prisma.user.createMany({
     data: [
       {
         id: "c1f89e00-1a2b-4567-8901-abcdef123456",
@@ -31,24 +35,30 @@ async function main() {
 
   console.log("✅ Users created!");
 
-  const accounts = await prisma.account.createMany({
+  await prisma.account.createMany({
     data: [
       {
         id: "a1b2c3d4-5678-90ab-cdef-112233445566",
         userId: "c1f89e00-1a2b-4567-8901-abcdef123456",
-        balance: 2000.0,
+        overallBalance: 2000.0,
+        transferDailyLimit: 5000.0,
+        withdrawalDailyLimit: 5000.0,
+        defaultCard: "card1-uuid",
       },
       {
         id: "d4c3b2a1-8765-09ab-fedc-665544332211",
         userId: "b2d47f00-5c2e-7890-1234-abcdef654321",
-        balance: 1500.0,
+        overallBalance: 1500.0,
+        transferDailyLimit: 5000.0,
+        withdrawalDailyLimit: 5000.0,
+        defaultCard: "card3-uuid",
       },
     ],
   });
 
   console.log("✅ Accounts created!");
 
-  const cards = await prisma.card.createMany({
+  await prisma.card.createMany({
     data: [
       {
         id: "card1-uuid",
@@ -80,7 +90,9 @@ async function main() {
     ],
   });
 
-  const transactions = await prisma.transaction.createMany({
+  console.log("✅ Cards created!");
+
+  await prisma.transaction.createMany({
     data: [
       {
         id: "txn1-uuid",
@@ -118,13 +130,13 @@ async function main() {
   });
 
   console.log("✅ Transactions created!");
-
   console.log("🌱 Database successfully seeded!");
 }
 
 main()
   .catch((error) => {
-    throw new Error(error("❌ Error seeding database:", error));
+    console.error("❌ Error seeding database:", error);
+    process.exit(1);
   })
   .finally(async () => {
     await prisma.$disconnect();
