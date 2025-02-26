@@ -110,12 +110,12 @@ export class TransactionController {
   }
   async getFinancialInfo(req: Request, res: Response): Promise<void> {
     try {
-      const { accountNumber } = req.body;
-      if (!accountNumber) {
+      const { account } = req.params;
+      if (!account) {
         res.status(400).json({ error: TRANSACTION_ERROR_MESSAGES.MISSING_PARAMETERS });
         return;
       }
-      const result = await this.transactionService.getFinancialInfo(accountNumber);
+      const result = await this.transactionService.getFinancialInfo(account);
       res.status(200).json(result);
     } catch (error: any) {
       if (error.message === TRANSACTION_ERROR_MESSAGES.ACCOUNT_NOT_FOUND) {

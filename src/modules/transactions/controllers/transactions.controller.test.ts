@@ -272,7 +272,8 @@ describe("🛠 Transaction Controller", () => {
   // -------------------------------
   describe("Financial Info Endpoint", () => {
     beforeEach(() => {
-      req = { body: { accountNumber: "123456" } };
+      // Instead of req.body, we set req.params here.
+      req = { params: { account: "123456" } };
     });
 
     it("✅ Should return 200 with full financial info for a valid account", async () => {
