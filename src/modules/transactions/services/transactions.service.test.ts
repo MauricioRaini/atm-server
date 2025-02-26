@@ -77,6 +77,18 @@ const mockReceiverCard = {
   updatedAt: new Date("2025-01-01"),
 };
 
+const mockFinancialAccount = {
+  id: "a1b2c3d4-5678-90ab-cdef-112233445566",
+  userId: "c1f89e00-1a2b-4567-8901-abcdef123456",
+  overallBalance: 2000, // as a number after conversion
+  withdrawalDailyLimit: 5000,
+  transferDailyLimit: 5000,
+  defaultCard: "card1-uuid",
+  createdAt: new Date("2025-01-01"),
+  updatedAt: new Date("2025-01-01"),
+  accountNumber: "123456",
+};
+
 describe("🛠 Transaction Service", () => {
   let transactionService: TransactionService;
   let transactionRepository: jest.Mocked<TransactionRepository>;
@@ -90,9 +102,42 @@ describe("🛠 Transaction Service", () => {
       updateCardBalance: jest.fn(),
       updateAccountBalance: jest.fn(),
       withdrawFromCard: jest.fn(),
+      getCardsByAccountId: jest.fn(),
     } as unknown as jest.Mocked<TransactionRepository>;
 
     transactionService = new TransactionService(transactionRepository);
+  });
+
+  describe("🔹 getFinancialInfo", () => {
+    it("✅ Should return full financial data for a valid account", async () => {
+      transactionRepository.getAccountByNumber.mockResolvedValue(mockFinancialAccount);
+      transactionRepository.getCardsByAccountId.mockResolvedValue([mockCard1, mockCard2]);
+
+      const result = await transactionService.getFinancialInfo("123456");
+
+      expect(transactionRepository.getAccountByNumber).toHaveBeenCalledWith("123456");
+      expect(transactionRepository.getCardsByAccountId).toHaveBeenCalledWith(
+        "a1b2c3d4-5678-90ab-cdef-112233445566",
+      );
+
+      const expected = {
+        accountNumber: "123456",
+        overallBalance: 2000,
+        withdrawalDailyLimit: 5000,
+        transferDailyLimit: 5000,
+        defaultCard: "card1-uuid",
+        cards: [mockCard1, mockCard2],
+      };
+
+      expect(result).toEqual(expected);
+    });
+
+    it("🚫 Should throw an error if account is not found", async () => {
+      transactionRepository.getAccountByNumber.mockResolvedValue(null);
+      await expect(transactionService.getFinancialInfo("NON_EXISTENT")).rejects.toThrow(
+        "Account not found",
+      );
+    });
   });
 
   describe("🔹 Given a deposit transaction", () => {

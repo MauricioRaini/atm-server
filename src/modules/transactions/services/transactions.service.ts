@@ -4,6 +4,29 @@ import { TransactionRepository } from "../repositories";
 export class TransactionService {
   constructor(private readonly transactionRepository: TransactionRepository) {}
 
+  async getFinancialInfo(accountNumber: string): Promise<{
+    accountNumber: string;
+    overallBalance: number;
+    withdrawalDailyLimit: number;
+    transferDailyLimit: number;
+    defaultCard: string;
+    cards: any[];
+  }> {
+    const account = await this.transactionRepository.getAccountByNumber(accountNumber);
+    if (!account) {
+      throw new Error("Account not found");
+    }
+    const cards = await this.transactionRepository.getCardsByAccountId(account.id);
+    return {
+      accountNumber: account.accountNumber,
+      overallBalance: account.overallBalance,
+      withdrawalDailyLimit: account.withdrawalDailyLimit,
+      transferDailyLimit: account.transferDailyLimit,
+      defaultCard: account.defaultCard,
+      cards,
+    };
+  }
+
   async deposit(accountNumber: string, depositAmount: number): Promise<void> {
     if (depositAmount <= 0) {
       throw new Error("Deposit amount must be positive");
