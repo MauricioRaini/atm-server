@@ -162,7 +162,9 @@ This project follows **TDD (Test-Driven Development)**:
 - **Integration Tests**: (Planned) Future integration tests to verify **end-to-end flows**.
 
 **📌 Coverage Report:**
-[Insert Coverage Badge or Image Here]
+This has initially been developed with a Test Coverage of almost 90%
+<img width="1099" alt="image" src="https://github.com/user-attachments/assets/f43d5986-ae6c-4c8a-ac28-882c959ff3aa" />
+
 
 ---
 
