@@ -1,5 +1,4 @@
 import { AuthRepository } from "../repositories/auth.repository";
-import { JwtMiddleware } from "../middlewares/jwt.middleware";
 import { HashMiddleware } from "../middlewares/hash.middleware";
 import {
   AUTH_MESSAGES,
@@ -9,10 +8,10 @@ import {
   TOKEN_TTL,
   USER_PUBLIC_FIELDS,
 } from "../constants";
+import { generateToken } from "@/shared/jwt.middleware";
 export class AuthService {
   constructor(
     private readonly authRepository: AuthRepository,
-    private readonly jwtProvider: JwtMiddleware,
     private readonly hashProvider: HashMiddleware,
   ) {}
 
@@ -51,7 +50,7 @@ export class AuthService {
 
     await this.authRepository.setFailedAttempts(user.id, 0);
 
-    const token = this.jwtProvider.generateToken({ userId: user.id });
+    const token = generateToken({ userId: user.id });
 
     const publicUser = {
       [USER_PUBLIC_FIELDS.ID]: user[USER_PUBLIC_FIELDS.ID],

@@ -1,15 +1,18 @@
 import { AuthService } from "../services/auth.service";
 import { AuthRepository } from "../repositories/auth.repository";
 import { jest } from "@jest/globals";
-import { HashMiddleware, JwtMiddleware } from "../middlewares";
+import { HashMiddleware } from "../middlewares/hash.middleware";
 import { AUTH_MESSAGES, FIVE_MINUTES_BLOCK, MAX_FAILED_ATTEMPTS, TOKEN_TTL } from "../constants";
 import { mockUser } from "../mocks";
 import { User } from "@prisma/client";
 
+jest.mock("@/shared/jwt.middleware.ts", () => ({
+  generateToken: jest.fn(() => "valid.jwt.token"),
+}));
+
 describe("🛠 Auth Service", () => {
   let authService: AuthService;
   let authRepository: jest.Mocked<AuthRepository>;
-  let jwtProvider: jest.Mocked<JwtMiddleware>;
   let hashProvider: jest.Mocked<HashMiddleware>;
 
   beforeEach(() => {
@@ -21,13 +24,13 @@ describe("🛠 Auth Service", () => {
       updateUserPin: jest.fn(),
     } as unknown as jest.Mocked<AuthRepository>;
 
-    jwtProvider = { generateToken: jest.fn() } as unknown as jest.Mocked<JwtMiddleware>;
     hashProvider = {
       compare: jest.fn(),
       hash: jest.fn(),
     } as unknown as jest.Mocked<HashMiddleware>;
 
-    authService = new AuthService(authRepository, jwtProvider, hashProvider);
+    // Note: Now AuthService takes only authRepository and hashProvider.
+    authService = new AuthService(authRepository, hashProvider);
   });
 
   describe("🔹 Given a user logs in", () => {
@@ -38,13 +41,12 @@ describe("🛠 Auth Service", () => {
         failedAttempts: 0,
       } as User);
       hashProvider.compare.mockResolvedValue(true);
-      jwtProvider.generateToken.mockReturnValue("valid.jwt.token");
 
       const result = await authService.login("123456", "000000");
 
       expect(authRepository.getUserByAccountNumber).toHaveBeenCalledWith("123456");
       expect(hashProvider.compare).toHaveBeenCalledWith("000000", "hashedPin");
-      expect(jwtProvider.generateToken).toHaveBeenCalledWith(expect.any(Object));
+      // The generateToken is now imported from our shared JWT module and is mocked
       expect(result).toEqual({
         user: {
           id: "user123",
@@ -56,7 +58,6 @@ describe("🛠 Auth Service", () => {
         token: "valid.jwt.token",
         timeToLive: 300,
       });
-
       expect(authRepository.setFailedAttempts).toHaveBeenCalledWith("user123", 0);
     });
 
@@ -107,7 +108,6 @@ describe("🛠 Auth Service", () => {
       } as User;
       authRepository.getUserByAccountNumber.mockResolvedValue(blockedUser);
       hashProvider.compare.mockResolvedValue(true);
-      jwtProvider.generateToken.mockReturnValue("valid.jwt.token");
 
       const result = await authService.login("123456", "000000");
 

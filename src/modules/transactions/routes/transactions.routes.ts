@@ -2,8 +2,11 @@ import { Router } from "express";
 import { TransactionController } from "../controllers/transactions.controller";
 import { TransactionService } from "../services/transactions.service";
 import { TransactionRepository } from "../repositories/transactions.repository";
+import { authenticateJWT } from "@/shared/jwt.middleware";
 
 const transactionRoutes = Router();
+
+transactionRoutes.use(authenticateJWT);
 
 const transactionRepository = new TransactionRepository();
 const transactionService = new TransactionService(transactionRepository);
