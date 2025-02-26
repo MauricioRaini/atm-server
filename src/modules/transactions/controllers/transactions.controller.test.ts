@@ -18,6 +18,7 @@ describe("🛠 Transaction Controller", () => {
       withdraw: jest.fn(),
       internalTransfer: jest.fn(),
       externalTransfer: jest.fn(),
+      getFinancialInfo: jest.fn(),
     } as unknown as jest.Mocked<TransactionService>;
 
     transactionController = new TransactionController(transactionService);
@@ -262,6 +263,50 @@ describe("🛠 Transaction Controller", () => {
       expect(res.status).toHaveBeenCalledWith(400);
       expect(jsonMock).toHaveBeenCalledWith({
         error: TRANSACTION_ERROR_MESSAGES.MISSING_PARAMETERS,
+      });
+    });
+  });
+
+  // -------------------------------
+  // Financial Info Endpoint Tests
+  // -------------------------------
+  describe("Financial Info Endpoint", () => {
+    beforeEach(() => {
+      req = { body: { accountNumber: "123456" } };
+    });
+
+    it("✅ Should return 200 with full financial info for a valid account", async () => {
+      const mockFinancialInfo = {
+        accountNumber: "123456",
+        overallBalance: 2000,
+        withdrawalDailyLimit: 5000,
+        transferDailyLimit: 5000,
+        defaultCard: "card1-uuid",
+        cards: [
+          { id: "card1-uuid", number: "4111111111111111" },
+          { id: "card2-uuid", number: "5500000000000004" },
+        ],
+      };
+
+      transactionService.getFinancialInfo.mockResolvedValue(mockFinancialInfo);
+
+      await transactionController.getFinancialInfo(req as Request, res as Response);
+
+      expect(transactionService.getFinancialInfo).toHaveBeenCalledWith("123456");
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(jsonMock).toHaveBeenCalledWith(mockFinancialInfo);
+    });
+
+    it("🚫 Should return 404 if account is not found", async () => {
+      transactionService.getFinancialInfo.mockRejectedValue(
+        new Error(TRANSACTION_ERROR_MESSAGES.ACCOUNT_NOT_FOUND),
+      );
+
+      await transactionController.getFinancialInfo(req as Request, res as Response);
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(jsonMock).toHaveBeenCalledWith({
+        error: TRANSACTION_ERROR_MESSAGES.ACCOUNT_NOT_FOUND,
       });
     });
   });

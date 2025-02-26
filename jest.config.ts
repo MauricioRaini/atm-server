@@ -8,7 +8,14 @@ export default {
   transform: { "^.+\\.ts$": "ts-jest" },
   clearMocks: true,
   coverageDirectory: "coverage",
-  collectCoverageFrom: ["src/**/*.ts"],
+  collectCoverageFrom: [
+    "src/**/*.ts",
+    // optionally ignore test files themselves
+    "!src/**/*.test.ts",
+  ],
+  coveragePathIgnorePatterns: ["/node_modules/", "/dist/", "index.ts$", "logger.ts$", "seed.ts$"],
   setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
-  moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, { prefix: "<rootDir>/src" }),
+  moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, {
+    prefix: "<rootDir>/src",
+  }),
 };

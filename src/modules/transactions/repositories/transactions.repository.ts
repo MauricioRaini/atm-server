@@ -75,4 +75,10 @@ export class TransactionRepository {
       data: { balance: { decrement: amount } },
     });
   }
+
+  async getCardsByAccountId(accountId: string): Promise<Card[]> {
+    return prisma.card.findMany({
+      where: { accountId },
+    });
+  }
 }

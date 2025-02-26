@@ -20,5 +20,8 @@ transactionRoutes.post("/internal-transfer", (req, res) =>
 transactionRoutes.post("/external-transfer", (req, res) =>
   transactionController.externalTransfer(req, res),
 );
+transactionRoutes.post("/financial-info", (req, res) =>
+  transactionController.getFinancialInfo(req, res),
+);
 
 export { transactionRoutes };

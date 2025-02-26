@@ -10,23 +10,23 @@ async function main() {
   await prisma.user.deleteMany();
   console.log("🌱 Seeding database...");
 
-  const defaultPinHash = hashSync("0000", 10);
+  const defaultPinHash = hashSync("000000", 10);
 
   await prisma.user.createMany({
     data: [
       {
         id: "c1f89e00-1a2b-4567-8901-abcdef123456",
         accountNumber: "123456",
-        firstName: "John",
-        lastName: "Doe",
-        email: "john.doe@email.com",
+        firstName: "Peter",
+        lastName: "Parker",
+        email: "peter.parker@email.com",
         pinHash: defaultPinHash,
       },
       {
         id: "b2d47f00-5c2e-7890-1234-abcdef654321",
         accountNumber: "654321",
-        firstName: "Jane",
-        lastName: "Smith",
+        firstName: "Canelo",
+        lastName: "Alvarez",
         email: "jane.smith@email.com",
         pinHash: defaultPinHash,
       },

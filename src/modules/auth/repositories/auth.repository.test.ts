@@ -14,9 +14,9 @@ jest.mock("@/config/prisma", () => ({
 const mockUser: User = {
   id: "user123",
   accountNumber: "123456",
-  firstName: "John",
-  lastName: "Doe",
-  email: "john.doe@example.com",
+  firstName: "Peter",
+  lastName: "Parker",
+  email: "peter.parker@example.com",
   pinHash: "hashedPin",
   failedAttempts: 0,
   blockedUntil: null,

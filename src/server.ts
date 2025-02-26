@@ -1,3 +1,4 @@
+require("module-alias/register");
 import express from "express";
 import { transactionRoutes } from "./modules/transactions/routes";
 import cors from "cors";

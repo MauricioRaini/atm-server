@@ -108,4 +108,21 @@ export class TransactionController {
       }
     }
   }
+  async getFinancialInfo(req: Request, res: Response): Promise<void> {
+    try {
+      const { accountNumber } = req.body;
+      if (!accountNumber) {
+        res.status(400).json({ error: TRANSACTION_ERROR_MESSAGES.MISSING_PARAMETERS });
+        return;
+      }
+      const result = await this.transactionService.getFinancialInfo(accountNumber);
+      res.status(200).json(result);
+    } catch (error: any) {
+      if (error.message === TRANSACTION_ERROR_MESSAGES.ACCOUNT_NOT_FOUND) {
+        res.status(404).json({ error: TRANSACTION_ERROR_MESSAGES.ACCOUNT_NOT_FOUND });
+      } else {
+        res.status(500).json({ error: TRANSACTION_ERROR_MESSAGES.GENERIC_ERROR });
+      }
+    }
+  }
 }
