@@ -13,6 +13,7 @@ jest.mock("@/config/prisma", () => ({
     card: {
       findUnique: jest.fn(),
       update: jest.fn(),
+      findMany: jest.fn(),
     },
   },
 }));
@@ -245,6 +246,56 @@ describe("🛠 Transaction Repository", () => {
       await expect(transactionRepository.withdrawFromCard("CARD1", 50)).rejects.toThrow(
         "Withdrawal error",
       );
+    });
+  });
+
+  describe("getCardsByAccountId", () => {
+    it("✅ Should return an array of cards when found", async () => {
+      const mockCards = [
+        {
+          id: "CARD1",
+          accountId: "ACC123",
+          number: "4111111111111111",
+          brand: "Visa",
+          expiry: new Date("2027-12-31"),
+          cvvHash: 123,
+          balance: new Decimal(1000),
+          createdAt: new Date("2025-01-01"),
+          updatedAt: new Date("2025-01-01"),
+        },
+        {
+          id: "CARD2",
+          accountId: "ACC123",
+          number: "5500000000000004",
+          brand: "MasterCard",
+          expiry: new Date("2026-11-30"),
+          cvvHash: 456,
+          balance: new Decimal(1000),
+          createdAt: new Date("2025-01-01"),
+          updatedAt: new Date("2025-01-01"),
+        },
+      ];
+
+      (prisma.card.findMany as jest.Mock).mockResolvedValue(mockCards);
+      const result = await transactionRepository.getCardsByAccountId("ACC123");
+      expect(prisma.card.findMany).toHaveBeenCalledWith({
+        where: { accountId: "ACC123" },
+      });
+      expect(result).toEqual(mockCards);
+    });
+
+    it("✅ Should return an empty array if no cards are found", async () => {
+      (prisma.card.findMany as jest.Mock).mockResolvedValue([]);
+      const result = await transactionRepository.getCardsByAccountId("NON_EXISTENT");
+      expect(prisma.card.findMany).toHaveBeenCalledWith({
+        where: { accountId: "NON_EXISTENT" },
+      });
+      expect(result).toEqual([]);
+    });
+
+    it("🚫 Should propagate error if DB fails", async () => {
+      (prisma.card.findMany as jest.Mock).mockRejectedValue(new Error("DB error"));
+      await expect(transactionRepository.getCardsByAccountId("ACC123")).rejects.toThrow("DB error");
     });
   });
 });
