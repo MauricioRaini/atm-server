@@ -1,0 +1,31 @@
+echo "🔍 Running ESLint to check for code issues..."
+npx eslint --fix . 
+ESLINT_EXIT_CODE=$?
+
+# TODO:Uncomment when tests are implemented
+# echo "🧪 Running tests to verify application integrity..."
+# npm test 
+# TEST_EXIT_CODE=$?
+
+echo "🛠️ Running build process to detect errors..."
+npm run build
+BUILD_EXIT_CODE=$?
+
+if [ $ESLINT_EXIT_CODE -ne 0 ]; then
+  echo "❌ ESLint found issues, but commit will proceed."
+else
+  echo "✅ ESLint passed."
+fi
+
+# TODO:Uncomment when tests are implemented
+# if [ $TEST_EXIT_CODE -ne 0 ]; then
+#   echo "❌ Tests failed, but commit will proceed."
+# else
+#   echo "✅ Tests passed."
+# fi
+
+if [ $BUILD_EXIT_CODE -ne 0 ]; then
+  echo "❌ Build failed, but commit will proceed."
+else
+  echo "✅ Build successful."
+fi

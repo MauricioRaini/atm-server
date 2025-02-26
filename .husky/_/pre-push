@@ -1,0 +1,68 @@
+echo "🚀 Preparing to push your code..."
+echo "🔍 Step 1: Running ESLint to check for errors and fix minor issues..."
+npx eslint --fix . 
+ESLINT_EXIT_CODE=$?
+
+if [ $ESLINT_EXIT_CODE -ne 0 ]; then
+  echo "❌ ESLint detected issues in the code!"
+  echo "⚠️ Please check the logs above to see the exact problems."
+  echo "📌 Common causes: Unused variables, incorrect imports, missing semicolons."
+else
+  echo "✅ ESLint passed with no issues!"
+fi
+
+# Uncomment when tests are implemented
+# echo "🧪 Step 2: Running tests to ensure application integrity..."
+# npm test 
+# TEST_EXIT_CODE=$?
+
+# if [ $TEST_EXIT_CODE -ne 0 ]; then
+#   echo "❌ Some tests have failed!"
+#   echo "⚠️ Please check the logs above to see what failed."
+#   echo "📌 Common causes: Functionality breaks, API changes, missing mocks."
+# else
+#   echo "✅ All tests passed successfully!"
+# fi
+
+echo "🛠️ Step 3: Running build process to detect compile-time issues..."
+npm run build
+BUILD_EXIT_CODE=$?
+
+if [ $BUILD_EXIT_CODE -ne 0 ]; then
+  echo "❌ Build process failed!"
+  echo "⚠️ Please check the logs above to see the exact errors."
+  echo "📌 Common causes: TypeScript errors, missing dependencies, incorrect imports."
+else
+  echo "✅ Build was successful!"
+fi
+
+# If any step failed, ask the developer if they want to proceed
+if [ $ESLINT_EXIT_CODE -ne 0 ] || [ $BUILD_EXIT_CODE -ne 0 ]; then
+  echo "🚨 🚨 🚨 WARNING: Issues detected! 🚨 🚨 🚨"
+  echo "❗ ESLint, Tests, or Build failed. Pushing this code **may break the repository**."
+  echo "⚠️ Here’s what went wrong:"
+  
+  if [ $ESLINT_EXIT_CODE -ne 0 ]; then
+    echo "🔴 ESLint failed. Code quality issues detected."
+  fi
+
+  # Uncomment when tests are implemented
+  # if [ $TEST_EXIT_CODE -ne 0 ]; then
+  #   echo "🔴 Some tests failed. Functionality may be broken."
+  # fi
+
+  if [ $BUILD_EXIT_CODE -ne 0 ]; then
+    echo "🔴 Build failed. The project will not run properly."
+  fi
+
+  echo "❓ Do you still want to push? **This code may break the repository or cause problems in the future** (yes/no)"
+  read ANSWER
+  if [ "$ANSWER" != "yes" ]; then
+    echo "🚫 Push canceled by user. Fix the issues and try again!"
+    exit 1
+  else
+    echo "⚠️ **You willingly chose to push with issues**. Proceeding..."
+  fi
+fi
+
+echo "✅ Push is proceeding... Be mindful of the warnings above."

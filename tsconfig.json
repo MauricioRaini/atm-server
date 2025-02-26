@@ -3,12 +3,20 @@
     "target": "ES6",
     "module": "CommonJS",
     "outDir": "./dist",
+    "resolveJsonModule": true,
     "rootDir": "./src",
     "strict": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["./*"]
+    }
   },
-  "include": ["src"],
+  "include": [
+    "src/types/**/*.d.ts",
+    "src/**/*"
+  ],
   "exclude": ["node_modules"]
 }

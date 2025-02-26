@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String  @id @default(uuid())
+  accountNumber String  @unique @db.VarChar(6)
+  firstName     String  @db.VarChar(255)
+  lastName      String  @db.VarChar(255)
+  email         String  @unique @db.VarChar(255)
+  failedAttempts Int     @default(0)
+  pinHash       String  @db.VarChar(255)
+  blockedUntil  DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  account Account?
+}
+
+model Account {
+  id                String   @id @default(uuid())
+  userId            String   @unique
+  overallBalance       Decimal  @default(0.00) @db.Decimal(12,2)
+  transferDailyLimit Decimal  @default(5000.00) @db.Decimal(12,2)
+  withdrawalDailyLimit Decimal @default(5000.00) @db.Decimal(12,2)
+  defaultCard          String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id])
+  cards  Card[]
+}
+
+model Card {
+  id        String   @id @default(uuid())
+  accountId String
+  number    String   @unique @db.VarChar(16)
+  brand     CardBrand
+  expiry    DateTime
+  cvvHash   Int
+  balance   Decimal  @default(0.00) @db.Decimal(12,2)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  account Account @relation(fields: [accountId], references: [id])
+  sentTransactions    Transaction[] @relation("SentTransactions")
+  receivedTransactions Transaction[] @relation("ReceivedTransactions")
+}
+
+model Transaction {
+  id             String    @id @default(uuid())
+  senderCardId   String?
+  receiverCardId String?
+  amount         Decimal   @db.Decimal(12,2)
+  type           TransactionType
+  status         TransactionStatus
+  timestamp      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  senderCard   Card? @relation(name: "SentTransactions", fields: [senderCardId], references: [id])
+  receiverCard Card? @relation(name: "ReceivedTransactions", fields: [receiverCardId], references: [id])
+}
+
+enum CardBrand {
+  Visa
+  MasterCard
+  Maestro
+  Plus
+  Star
+  Pulse
+}
+
+enum TransactionType {
+  Withdrawal
+  Deposit
+  Transfer
+}
+
+enum TransactionStatus {
+  Pending
+  Completed
+  Failed
+}
