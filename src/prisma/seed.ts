@@ -10,7 +10,7 @@ async function main() {
   await prisma.user.deleteMany();
   console.log("🌱 Seeding database...");
 
-  const defaultPinHash = hashSync("0000", 10);
+  const defaultPinHash = hashSync("000000", 10);
 
   await prisma.user.createMany({
     data: [
