@@ -8,7 +8,7 @@ import {
   TOKEN_TTL,
   USER_PUBLIC_FIELDS,
 } from "../constants";
-import { generateToken } from "@/shared/jwt.middleware";
+import { generateToken } from "@/shared";
 export class AuthService {
   constructor(
     private readonly authRepository: AuthRepository,

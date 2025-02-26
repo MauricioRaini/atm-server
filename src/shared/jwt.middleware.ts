@@ -1,14 +1,15 @@
 import { Request, Response, NextFunction } from "express";
 import jwt, { Secret } from "jsonwebtoken";
 
-const secret: Secret = process.env.JWT_SECRET || "default_secret";
 const expiresIn: string = "15m";
 
 export const generateToken = (payload: object): string => {
+  const secret: Secret = process.env.JWT_SECRET || "default_secret";
   return jwt.sign(payload, secret, { expiresIn } as jwt.SignOptions);
 };
 
 export const verifyToken = (token: string): any => {
+  const secret: Secret = process.env.JWT_SECRET || "default_secret";
   return jwt.verify(token, secret);
 };
 
