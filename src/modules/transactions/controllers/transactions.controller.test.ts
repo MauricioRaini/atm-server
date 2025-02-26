@@ -65,7 +65,9 @@ describe("🛠 Transaction Controller", () => {
       await transactionController.deposit(req as Request, res as Response);
 
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(jsonMock).toHaveBeenCalledWith({ error: "Deposit amount must be positive" });
+      expect(jsonMock).toHaveBeenCalledWith({
+        error: TRANSACTION_ERROR_MESSAGES.DEPOSIT_AMOUNT_NOT_POSITIVE,
+      });
     });
   });
 
@@ -114,7 +116,9 @@ describe("🛠 Transaction Controller", () => {
       await transactionController.withdraw(req as Request, res as Response);
 
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(jsonMock).toHaveBeenCalledWith({ error: "Missing required parameters" });
+      expect(jsonMock).toHaveBeenCalledWith({
+        error: TRANSACTION_ERROR_MESSAGES.MISSING_PARAMETERS,
+      });
     });
   });
 
@@ -173,7 +177,9 @@ describe("🛠 Transaction Controller", () => {
       req = { body: { accountId: "ACC123", senderCardId: "CARD1" } };
       await transactionController.internalTransfer(req as Request, res as Response);
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(jsonMock).toHaveBeenCalledWith({ error: "Missing required parameters" });
+      expect(jsonMock).toHaveBeenCalledWith({
+        error: TRANSACTION_ERROR_MESSAGES.MISSING_PARAMETERS,
+      });
     });
   });
 
@@ -254,7 +260,9 @@ describe("🛠 Transaction Controller", () => {
       req = { body: { senderAccountId: "ACC123", senderCardId: "CARD1" } };
       await transactionController.externalTransfer(req as Request, res as Response);
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(jsonMock).toHaveBeenCalledWith({ error: "Missing required parameters" });
+      expect(jsonMock).toHaveBeenCalledWith({
+        error: TRANSACTION_ERROR_MESSAGES.MISSING_PARAMETERS,
+      });
     });
   });
 });

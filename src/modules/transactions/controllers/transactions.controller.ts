@@ -9,11 +9,11 @@ export class TransactionController {
     try {
       const { accountNumber, depositAmount } = req.body;
       if (!accountNumber || depositAmount === undefined) {
-        res.status(400).json({ error: "Missing required parameters" });
+        res.status(400).json({ error: TRANSACTION_ERROR_MESSAGES.MISSING_PARAMETERS });
         return;
       }
       if (depositAmount <= 0) {
-        res.status(400).json({ error: "Deposit amount must be positive" });
+        res.status(400).json({ error: TRANSACTION_ERROR_MESSAGES.DEPOSIT_AMOUNT_NOT_POSITIVE });
         return;
       }
       await this.transactionService.deposit(accountNumber, depositAmount);
@@ -22,7 +22,7 @@ export class TransactionController {
       if (error.message === TRANSACTION_ERROR_MESSAGES.INVALID_ACCOUNT) {
         res.status(404).json({ error: TRANSACTION_ERROR_MESSAGES.INVALID_ACCOUNT });
       } else {
-        res.status(500).json({ error: "Something went wrong. Please try again later." });
+        res.status(500).json({ error: TRANSACTION_ERROR_MESSAGES.GENERIC_ERROR });
       }
     }
   }
@@ -31,7 +31,7 @@ export class TransactionController {
     try {
       const { accountId, cardId, withdrawalAmount } = req.body;
       if (!accountId || !cardId || withdrawalAmount === undefined) {
-        res.status(400).json({ error: "Missing required parameters" });
+        res.status(400).json({ error: TRANSACTION_ERROR_MESSAGES.MISSING_PARAMETERS });
         return;
       }
       const result = await this.transactionService.withdraw(accountId, cardId, withdrawalAmount);
@@ -42,10 +42,13 @@ export class TransactionController {
         error.message === TRANSACTION_ERROR_MESSAGES.DAILY_WITHDRAWAL_LIMIT_EXCEEDED
       ) {
         res.status(422).json({ error: error.message });
-      } else if (error.message === "Account not found" || error.message === "Card not found") {
+      } else if (
+        error.message === TRANSACTION_ERROR_MESSAGES.ACCOUNT_NOT_FOUND ||
+        error.message === TRANSACTION_ERROR_MESSAGES.CARD_NOT_FOUND
+      ) {
         res.status(404).json({ error: error.message });
       } else {
-        res.status(500).json({ error: "Something went wrong. Please try again later." });
+        res.status(500).json({ error: TRANSACTION_ERROR_MESSAGES.GENERIC_ERROR });
       }
     }
   }
@@ -54,7 +57,7 @@ export class TransactionController {
     try {
       const { accountId, senderCardId, recipientCardId, transferAmount } = req.body;
       if (!accountId || !senderCardId || !recipientCardId || transferAmount === undefined) {
-        res.status(400).json({ error: "Missing required parameters" });
+        res.status(400).json({ error: TRANSACTION_ERROR_MESSAGES.MISSING_PARAMETERS });
         return;
       }
       const result = await this.transactionService.internalTransfer(
@@ -68,7 +71,7 @@ export class TransactionController {
       if (error.message === TRANSACTION_ERROR_MESSAGES.INSUFFICIENT_FUNDS) {
         res.status(422).json({ error: TRANSACTION_ERROR_MESSAGES.INSUFFICIENT_FUNDS });
       } else {
-        res.status(500).json({ error: "Something went wrong. Please try again later." });
+        res.status(500).json({ error: TRANSACTION_ERROR_MESSAGES.GENERIC_ERROR });
       }
     }
   }
@@ -82,7 +85,7 @@ export class TransactionController {
         !receiverAccountNumber ||
         transferAmount === undefined
       ) {
-        res.status(400).json({ error: "Missing required parameters" });
+        res.status(400).json({ error: TRANSACTION_ERROR_MESSAGES.MISSING_PARAMETERS });
         return;
       }
       const result = await this.transactionService.externalTransfer(
@@ -101,7 +104,7 @@ export class TransactionController {
       ) {
         res.status(422).json({ error: error.message });
       } else {
-        res.status(500).json({ error: "Something went wrong. Please try again later." });
+        res.status(500).json({ error: TRANSACTION_ERROR_MESSAGES.GENERIC_ERROR });
       }
     }
   }
