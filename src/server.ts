@@ -1,5 +1,6 @@
 import express from "express";
-import { authRoutes } from "./modules/auth/routes/auth.routes";
+import { transactionRoutes } from "./modules/transactions/routes";
+import { authRoutes } from "./modules/auth/routes";
 
 const PORT = process.env.PORT || 3000;
 
@@ -7,6 +8,7 @@ const app = express();
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
+app.use("/api/transactions", transactionRoutes);
 
 app.get("/health", (_req, res) => {
   res.status(200).json({ status: "OK" });

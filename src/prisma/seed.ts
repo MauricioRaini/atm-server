@@ -8,7 +8,6 @@ async function main() {
 
   const defaultPinHash = hashSync("0000", 10);
 
-  // Create users with accountNumber here (since it's in the User model)
   await prisma.user.createMany({
     data: [
       {
@@ -55,7 +54,6 @@ async function main() {
 
   console.log("✅ Accounts created!");
 
-  // Create cards
   await prisma.card.createMany({
     data: [
       {
@@ -90,7 +88,6 @@ async function main() {
 
   console.log("✅ Cards created!");
 
-  // Create transactions
   await prisma.transaction.createMany({
     data: [
       {

@@ -2,7 +2,7 @@ import { TRANSACTION_ERROR_MESSAGES } from "../constants";
 import { TransactionRepository } from "../repositories";
 
 export class TransactionService {
-  constructor(private transactionRepository: TransactionRepository) {}
+  constructor(private readonly transactionRepository: TransactionRepository) {}
 
   async deposit(accountNumber: string, depositAmount: number): Promise<void> {
     if (depositAmount <= 0) {
