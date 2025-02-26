@@ -9,6 +9,7 @@ An advanced RESTful API simulating an ATM machine. The API supports secure user 
 - [Overview](#overview)
 - [Tech Stack](#tech-stack)
 - [Architecture & Design Patterns](#architecture--design-patterns)
+- [Database Schema](#database--schema)
 - [Modules Overview](#modules-overview)
 - [Transactions API Documentation](#transactions-api-documentation)
 - [Routes Protection](#routes-protection)
@@ -61,6 +62,12 @@ We chose a **modular monolith architecture** for the following reasons:
 - **Controller Layer**: Handles HTTP requests, delegates to services, and formats responses.
 - **Middleware**: Manages **CORS, JWT authentication, and error handling** for secure request processing.
 - **TDD (Test-Driven Development)**: Ensures correctness and facilitates future changes through structured **unit tests**.
+
+---
+
+## 🏗️ Database Schema
+
+![DBSchema](https://github.com/user-attachments/assets/048e14f7-efa7-4b8b-adca-c70a5db123a0)
 
 ---
 
